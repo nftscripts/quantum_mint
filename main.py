@@ -7,8 +7,9 @@ from typing import (
 )
 
 from asyncio import (
+    create_task,
     gather,
-    run
+    run,
 )
 
 from loguru import logger
@@ -28,9 +29,10 @@ async def main() -> None:
     tasks = []
     for private_key in private_keys:
         nft_buyer = Mint(private_key)
-        task = nft_buyer.mint()
+        task = create_task(nft_buyer.mint())
         tasks.append(task)
         sleep_time = random.randint(MIN_PAUSE, MAX_PAUSE)
+        await task
         logger.info(f'Sleeping {sleep_time} seconds..')
         await sleep(sleep_time)
     await gather(*tasks)
